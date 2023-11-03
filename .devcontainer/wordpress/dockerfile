@@ -1,0 +1,15 @@
+FROM php:8.1-apache
+
+COPY ./ports.conf /etc/apache2/ports.conf
+COPY ./000-default.conf /etc/apache2/sites-enabled/000-default.conf
+
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+RUN chmod +x /usr/local/bin/install-php-extensions && \
+    install-php-extensions imagick zip mysqli gd exif intl
+
+RUN usermod -a -G users www-data
+
+RUN a2enmod rewrite
+# RUN usermod -a -G root www-data
+

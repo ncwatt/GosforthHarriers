@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  web:
+    build: wordpress
+    image: gtctek/wordpress:latest
+    container_name: ghac_web
+    hostname: web
+    ports:
+      - '8080:80'
+    volumes:
+      - ../:/var/www/html
+    depends_on:
+      - mariadb
+    networks:
+      - dev_env
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: ghac_phpmyadmin
+    hostname: phpmyadmin
+    ports:
+      - 8081:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mariadb
+    depends_on:
+      - mariadb
+    networks:
+      - dev_env
+  mariadb:
+    image: mariadb:latest
+    container_name: ghac_mariadb
+    hostname: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: 'r00tp4ssw0rd'
+      MYSQL_USER: 'dbuser'
+      MYSQL_PASSWORD: 'w0rdpr3ss'
+      MYSQL_DATABASE: 'wordpress'
+    volumes:
+      - mysqldata:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - dev_env
+volumes:
+  mysqldata: {}
+networks:
+  dev_env: {}
