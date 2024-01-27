@@ -1,0 +1,28 @@
+{"liveSassCompile.settings.formats": [
+    // Default format
+    {
+        "format": "expanded",
+        "extensionName": ".css",
+        "savePath": "/wp-content/themes/ghac/assets/css"
+
+        // / -> denotes relative to the workspace root
+        // null denotes the same path as the SASS file
+        //"savePath": null,
+        //"savePathReplacementPairs": null
+    },
+    // Compressed format
+    {
+        "format": "compressed",
+        "extensionName": ".min.css",
+        "savePath": "/wp-content/themes/ghac/assets/css"
+
+        // / -> denotes relative to the workspace root
+        // null denotes the same path as the SASS file
+        //"savePath": null,
+        //"savePathReplacementPairs": null
+    }
+],
+"liveSassCompile.settings.includeItems": [
+    "/wp-content/themes/ghac/assets/scss/styles.scss",
+]
+}
