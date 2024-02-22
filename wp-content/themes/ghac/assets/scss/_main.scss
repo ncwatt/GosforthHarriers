@@ -1,4 +1,21 @@
 body {
     background: $color0;
+    color: $color3;
     font-family: $font-default;
+}
+
+h1 {
+    font-family: $font-headings;
+    font-weight: 200;
+}
+
+h6 {
+    font-family: $font-headings;
+    font-size: 1.25em;
+    font-weight: 200;
+    margin: 0 0 0 0;
+}
+
+.contentm {
+    background-color: $color1;
 }
