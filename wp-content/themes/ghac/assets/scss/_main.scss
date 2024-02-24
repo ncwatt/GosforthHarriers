@@ -4,24 +4,49 @@ body {
     font-family: $font-default;
 }
 
-a.club_button, a.club_button:active, a.club_button:link, a:visited {
-    background-color: transparent;
-    border: 1px solid $color0;
+a.club-button, a.club-button:active, a.club-button:link, a.club-button:visited {
     border-radius: 40px;
-    color: $color0;
     display: block;
-    margin: 0px auto 0px auto;
     max-width: 200px;
     padding: 8px 30px 8px;
+    text-align: center;
     text-decoration: none;
     transition: background-color 0.2s linear;
 }
 
-a.club_button:hover {
+a.club-button-left {
+    margin: 0px auto 0px 0px;
+}
+
+a.club-button-center {
+    margin: 0px auto 0px auto;
+}
+
+a.club-button-right {
+    margin: 0px 0px 0px auto;
+}
+
+a.club-button-1 {
+    background-color: transparent;
+    border: 1px solid $color0;
+    color: $color0;
+}
+
+a.club-button-1:hover {
     background-color: $color0;
     color: $color1;
 }
 
+a.club-button-2 {
+    background-color: $color0;
+    border: 1px solid $color0;
+    color: $color1;
+}
+
+a.club-button-2:hover {
+    background-color: $color1;
+    color: $color0;
+}
 
 h1 {
     font-family: $font-headings;
@@ -37,4 +62,14 @@ h6 {
 
 .contentm {
     background-color: $color1;
+}
+
+.content-1 {
+    background-color: $color1;
+    padding: 3em 0 3em 0;
+}
+
+.content-4 {
+    background-color: $color4;
+    padding: 3em 0 3em 0;
 }
