@@ -1,12 +1,17 @@
 .features {
-    background-color: $color1;
-    padding: 0 0 3em 0;
+    /*background-color: $color1;*/
+    /*padding: 0 0 3em 0;*/
     text-align: center;
 
     .feature {
-        margin-top: -100px;
+        margin-top: -200px;
         z-index: 9999;
-        
+
+        a.club-button {
+            margin-top: 2em;
+            margin-bottom: 2em;
+        }
+
         hr {
             background-image: linear-gradient(to right, $color1, $color0, $color0, $color0, $color1);
             border: 0;
@@ -15,12 +20,7 @@
         }
     
         img {
-            padding: 0 0 1em 0;
+            padding: 0 0 2em 0;
         }
     }
-}
-
-.welcome {
-    background-color: $color4;
-    padding: 1em 0 1em 0;
 }
