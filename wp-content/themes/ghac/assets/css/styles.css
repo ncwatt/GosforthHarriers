@@ -21,29 +21,17 @@
   }
 }
 .features {
-  background-color: #ffffff;
-  padding: 0 0 3em 0;
+  /*background-color: $color1;*/
+  /*padding: 0 0 3em 0;*/
   text-align: center;
 }
 .features .feature {
-  margin-top: -100px;
+  margin-top: -200px;
   z-index: 9999;
 }
-.features .feature a, .features .feature a:active, .features .feature a:link, .features .feature a:visited {
-  background-color: transparent;
-  border: 1px solid #92d884;
-  border-radius: 40px;
-  color: #92d884;
-  display: block;
-  margin: 0px auto 0px auto;
-  max-width: 200px;
-  padding: 8px 30px 8px;
-  text-decoration: none;
-  transition: background-color 0.2s linear;
-}
-.features .feature a:hover {
-  background-color: #92d884;
-  color: #ffffff;
+.features .feature a.club-button {
+  margin-top: 2em;
+  margin-bottom: 2em;
 }
 .features .feature hr {
   background-image: linear-gradient(to right, #ffffff, #92d884, #92d884, #92d884, #ffffff);
@@ -52,18 +40,57 @@
   /*margin: 0 0 0 0;*/
 }
 .features .feature img {
-  padding: 0 0 1em 0;
-}
-
-.welcome {
-  background-color: #dfdfdf;
-  padding: 1em 0 1em 0;
+  padding: 0 0 2em 0;
 }
 
 body {
   background: #92d884;
   color: #4d4d4d;
   font-family: "PT Sans", sans-serif;
+}
+
+a.club-button, a.club-button:active, a.club-button:link, a.club-button:visited {
+  border-radius: 40px;
+  display: block;
+  max-width: 200px;
+  padding: 8px 30px 8px;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.2s linear;
+}
+
+a.club-button-left {
+  margin: 0px auto 0px 0px;
+}
+
+a.club-button-center {
+  margin: 0px auto 0px auto;
+}
+
+a.club-button-right {
+  margin: 0px 0px 0px auto;
+}
+
+a.club-button-1 {
+  background-color: transparent;
+  border: 1px solid #92d884;
+  color: #92d884;
+}
+
+a.club-button-1:hover {
+  background-color: #92d884;
+  color: #ffffff;
+}
+
+a.club-button-2 {
+  background-color: #92d884;
+  border: 1px solid #92d884;
+  color: #ffffff;
+}
+
+a.club-button-2:hover {
+  background-color: #ffffff;
+  color: #92d884;
 }
 
 h1 {
@@ -80,6 +107,16 @@ h6 {
 
 .contentm {
   background-color: #ffffff;
+}
+
+.content-1 {
+  background-color: #ffffff;
+  padding: 3em 0 3em 0;
+}
+
+.content-4 {
+  background-color: #dfdfdf;
+  padding: 3em 0 3em 0;
 }
 
 .footer {
