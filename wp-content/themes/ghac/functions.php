@@ -67,7 +67,7 @@ if ( ! function_exists( 'get_frontpage_feature') ):
         $image = wp_get_attachment_image_src( get_post_thumbnail_id( $feature->ID ), 'single-post-thumbnail' );
         echo "<img src=\"" . $image[0] . "\" alt=\"test\" class=\"img-fluid\">";
       endif;
-      echo $feature->post_content;
+      echo apply_filters( 'the_content', $feature->post_content );
     else:
       echo "There is a problem with the template.";
     endif;
