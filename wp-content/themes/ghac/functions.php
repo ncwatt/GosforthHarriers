@@ -49,13 +49,8 @@ add_action( 'wp_enqueue_scripts', 'ghac_load_javascript' );
 if ( ! function_exists( 'get_pageid_by_pageslug' ) ):
   function get_pageid_by_pageslug( $page_slug ) {
     $page = get_page_by_path( $page_slug );
-    return ( ! empty( $page ) ? $page->ID : null );
-    //if ($page) {
 
-      //return $page->ID;
-    //} else {
-      //return null;
-    //}
+    return ( ! empty( $page ) ? $page->ID : null );
   } 
 endif;
 
@@ -73,6 +68,45 @@ if ( ! function_exists( 'get_frontpage_feature') ):
     endif;
   }
 endif;
+
+/* WooCommerce */
+function wc_override_checkout_fields( $fields ) {
+  $fields['billing']['billing_company']['placeholder'] = 'Running club required when entering events';
+  $fields['billing']['billing_company']['label']       = 'Club name';
+  //echo "<pre>" . print_r($fields) . "</pre>";
+  return $fields;
+}
+add_filter( 'woocommerce_checkout_fields' , 'wc_override_checkout_fields' );
+
+
+function wc_form_field_args($args, $key, $value) {
+  $args['input_class'] = array( 'form-control' );
+  return $args;
+}
+add_filter('woocommerce_form_field_args',  'wc_form_field_args', 10, 3);
+
+if ( ! function_exists( 'woocommerce_checkout_field_club' ) ):
+  function woocommerce_checkout_field_club() {
+    $domain = 'woocommerce';
+    $checkout = WC()->checkout;
+    echo '<div id="custom_checkout_field"><h2>' . __('New Heading') . '</h2>';
+    woocommerce_form_field( 
+      'club_name', 
+      array(
+        'type' => 'text',
+        'class' => array(
+          'my-field-class form-row-wide'
+        ),
+        'label' => __('Custom Additional Field'),
+        'placeholder' => __('New Custom Field'),
+        'required' => false,
+      ),
+      $checkout->get_value('club_name')
+    );
+    echo '</div>';
+  }
+endif;
+//add_action( 'woocommerce_after_order_notes', 'woocommerce_checkout_field_club');
 
 // bootstrap 5 wp_nav_menu walker
 class bootstrap_5_wp_nav_menu_walker extends Walker_Nav_menu
