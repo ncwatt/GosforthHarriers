@@ -7,9 +7,9 @@
 </head>
 <body <?php body_class(); ?>>
 <header>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary shadow">
         <div class="container">
-            <a class="navbar-brand" href="#"><img src="<?php echo get_template_directory_uri() . '/assets/img/ghac_logo.png' ?>" alt="Gosforth Harriers & AC Logo" class="navbar-logo" /></a>
+            <a class="navbar-brand" href="/"><img src="<?php echo get_template_directory_uri() . '/assets/img/ghac_logo.png' ?>" alt="Gosforth Harriers & AC Logo" class="navbar-logo" /></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topMenu" aria-controls="topMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
