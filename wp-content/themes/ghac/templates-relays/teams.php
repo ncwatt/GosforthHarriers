@@ -27,13 +27,13 @@
 							foreach($teams as $row) {
 						?>
 							<tr>
-								<th scope="row"><a href="relays-edit-team"><?php echo $row->TeamNumber ?></a></th>
-								<td><a href="relays-edit-team"><?php echo $row->TeamName ?></a></td>
-								<td><?php echo $row->ClubName ?></td>
-								<td><?php echo $row->Category ?></td>
-								<td><?php echo $row->RunnerA ?></td>
-								<td><?php echo $row->RunnerB ?></td>
-								<td><?php echo $row->RunnerC ?></td>
+								<th scope="row"><a href="<?php echo get_page_permalink_by_pageslug( 'summer-relays/edit-team' ) . '?teamid=' . $row->TeamID; ?>"><?php echo $row->TeamNumber; ?></a></th>
+								<td><a href="<?php echo get_page_permalink_by_pageslug( 'summer-relays/edit-team' ) . '?teamid=' . $row->TeamID; ?>"><?php echo $row->TeamName ?></a></td>
+								<td><?php echo $row->ClubName; ?></td>
+								<td><?php echo $row->Category; ?></td>
+								<td><?php echo $row->RunnerA; ?></td>
+								<td><?php echo $row->RunnerB; ?></td>
+								<td><?php echo $row->RunnerC; ?></td>
 							</tr>
 						<?php
 							}
