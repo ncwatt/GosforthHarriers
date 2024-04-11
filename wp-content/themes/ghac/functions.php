@@ -41,10 +41,22 @@ add_action( 'wp_enqueue_scripts', 'ghac_load_stylesheets' );
 
 if ( ! function_exists( 'ghac_load_javascript' ) ) :
   function ghac_load_javascript() {
-
+    wp_enqueue_script( 'scripts', get_template_directory_uri() . '/assets/js/app.js', '', '0.1.0', 'all' );
   }
 endif;
 add_action( 'wp_enqueue_scripts', 'ghac_load_javascript' );
+
+// Form Inputs
+if ( ! function_exists( 'form_input_checks' ) ) :
+  function form_input_checks($data, $trim = true, $slashes = true, $specialchars = true) {
+    if ($trim == true) $data = trim($data);
+    if ($slashes == true) $data = stripslashes($data);
+    if ($specialchars == true) $data = htmlspecialchars($data);
+    return $data;
+  }
+endif;
+
+
 
 if ( ! function_exists( 'get_pageid_by_pageslug' ) ):
   function get_pageid_by_pageslug( $page_slug ) {
@@ -52,6 +64,14 @@ if ( ! function_exists( 'get_pageid_by_pageslug' ) ):
 
     return ( ! empty( $page ) ? $page->ID : null );
   } 
+endif;
+
+if ( ! function_exists( 'get_page_permalink_by_pageslug' ) ):
+  function get_page_permalink_by_pageslug( $page_slug ) {
+    $pageID = get_pageid_by_pageslug( $page_slug );
+
+    return ( ! empty( $pageID ) ? get_permalink( $pageID ) : null );
+  }
 endif;
 
 if ( ! function_exists( 'get_frontpage_feature') ):
