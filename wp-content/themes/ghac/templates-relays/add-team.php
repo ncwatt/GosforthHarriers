@@ -2,24 +2,28 @@
 /*
 	Template Name: Summer Relays - Add Team
 */
+
 // Check that the user is logged in - if not redirect to login page
 if ( ! is_user_logged_in() ) { wp_redirect( wp_login_url() . '?redirect_to=' . urlencode( $_SERVER['REQUEST_URI'] ) ); }
 
-// Determine if the user is an administrator or not
-$user = wp_get_current_user();
-if ( in_array( 'Administrator', (array) $user->roles ) ) { $isAdmin = true; } else { $isAdmin = false; }
-
-
 if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 	if ( isset( $_POST['addTeamForm'] ) ) {
+		// Get the values from the form
+		$teamNum = isset( $_POST['teamNumber'] ) ? form_input_checks( $_POST['teamNumber'] ) : null;
+		$teamNumAuto = isset( $_POST['teamNumberAuto'] ) ? true : false;
+		$teamName = form_input_checks( $_POST['teamName'] );
+		$category = form_input_checks( $_POST["category"] );
+		$clubName = form_input_checks( $_POST['clubName'] );
+		$email = form_input_checks( $_POST["emailAddress"] );
+		$firstName = form_input_checks( $_POST["firstName"] );
+		$lastName = form_input_checks( $_POST["lastName"] );
+
 		// Set postSuccess to true - this will get set to false during validation if a value fails
         $postSuccess = true;
 		$errors = array();
 
 		// Validate team number
 		$teamNumErr = false;
-		$teamNum = isset( $_POST['teamNumber'] ) ? form_input_checks( $_POST['teamNumber'] ) : null;
-		$teamNumAuto = isset( $_POST['teamNumberAuto'] ) ? true : false;
 		$team_query = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ghac_c_teams WHERE TeamNumber = %d", $teamNum );
 		$team_results = $wpdb->get_results( $team_query );
 		if ( !empty( $team_results ) ) {
@@ -34,7 +38,6 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 		
 		// Validate team name
 		$teamNameErr = false;
-		$teamName = form_input_checks( $_POST['teamName'] );
 		$team_query = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ghac_c_teams WHERE TeamName = %s", $teamName );
 		$team_results = $wpdb->get_results( $team_query );
 		if ( !empty( $team_results ) ) {
@@ -43,13 +46,9 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 			$postSuccess = false;
 		}
 
-		// Get the category
-		$category = form_input_checks( $_POST["category"] );
-
 		// Validate a club name
 		$clubNameErr = false;
-		$clubName = form_input_checks( $_POST['clubName'] );
-		if ( ! ( strlen( $clubName ) > 0 && strlen( $clubName ) <= 75) ) {
+		if ( ! ( strlen( $clubName ) > 0 && strlen( $clubName ) <= 75 ) ) {
             $clubNameErr = true;
 			$errors[] = 'You have not entered the running club name that this team is associated with';
             $postSuccess = false;
@@ -57,7 +56,6 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 
 		// Validate email address
 		$emailErr = false;
-        $email = form_input_checks( $_POST["emailAddress"] );
         if ( ! ( strlen( $email ) > 0 ) ) {
 			$emailErr = true;
 			$errors[] = 'You have not entered the email address of the club contact used during registration';
@@ -67,6 +65,22 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 			$errors[] = 'The email address entered is not valid';
             $postSuccess = false;
         }
+
+		// Validate the first name
+		$firstNameErr = false;
+		if ( ! ( strlen( $firstName ) > 0 && strlen( $firstName ) <= 35 ) ) {
+			$firstNameErr = true;
+			$errors[] = 'You have not entered the first name of the club contact';
+			$postSuccess = false;
+		}
+
+		// Validate the last name
+		$lastNameErr = false;
+		if ( ! ( strlen( $lastName ) > 0 && strlen( $lastName ) <= 35 ) ) {
+			$lastNameErr = true;
+			$errors[] = 'You have not entered the last name of the club contact';
+			$postSuccess = false;
+		}
 
 		if ( $postSuccess ) {
 			if ( ! isset( $teamNum ) ) {
@@ -89,7 +103,7 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 				'TeamNumber' => $teamNum,
 				'TeamName' => $teamName,
 				'Category' => $category, 
-				'ClubName' => $clubName
+				'ClubName' => $clubName,
 			) );
 			$teamID = $wpdb->insert_id;
 
@@ -97,11 +111,27 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 			$emailID = $wpdb->get_var( $wpdb->prepare( "SELECT EmailID FROM {$wpdb->prefix}ghac_c_emails WHERE EmailAddress = %s", $email ) );
 			if ( ! isset( $emailID ) ) {
 				// Insert the email into the table
-				$wpdb->insert( "{$wpdb->prefix}ghac_c_emails", array(
-					'EmailAddress' => $email
-				) );
+				$wpdb->insert( "{$wpdb->prefix}ghac_c_emails", 
+					array(
+						'EmailAddress' => $email,
+						'FirstName' => $firstName,
+						'LastName' => $lastName
+					) 
+				);
 				// Get the emailID for the newly inserted record
 				$emailID = $wpdb->insert_id;
+			} else {
+				// Update the name and last name for the email address supplied
+				$wpdb->update( 
+					"{$wpdb->prefix}ghac_c_emails", 
+					array(
+						'FirstName' => $firstName,
+						'LastName' => $lastName
+					),
+					array(
+						'EmailID' => $emailID
+					)
+				);
 			}
 
 			// Insert link the team and the email address
@@ -124,7 +154,7 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 	<div class="container">
 		<div class="row">
 			<div class="col-12">
-				<?php if ( $isAdmin = false ) : ?>
+				<?php if ( ! is_user_in_role( 'administrator' ) ) : ?>
 					<div class="alert alert-danger" role="alert">
                         <p>You are not authorised to view this page.</p>
                     </div>
@@ -199,6 +229,18 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 											<label for="emailAddress" class="form-label">Email address</label>
                         					<input type="email" id="emailAddress" name="emailAddress" aria-describedby="emailAddressHelp" maxlength="254" value="<?php echo( isset( $email ) ) ? $email : ''; ?>" class="form-control <?php if ( isset( $emailErr ) ) { echo( $emailErr == true ) ? 'is-invalid' : 'is-valid'; } ?>" >
                         					<div id="emailAddressHelp" class="form-text">Enter the email address of the club contact used during registration. Additional email addresses can be added later.</div>
+										</div>
+										<div class="row">
+											<div class="col-md-6 mb-3">
+												<label for="firstName" class="form-label">First Name</label>
+                        						<input type="text" id="firstName" name="firstName" aria-describedby="firstNameHelp" maxlength="35" value="<?php echo( isset( $firstName ) ) ? $firstName : ''; ?>" class="form-control <?php if ( isset( $firstNameErr ) ) { echo( $firstNameErr == true ) ? 'is-invalid' : 'is-valid'; } ?>" >
+                        						<div id="firstNameHelp" class="form-text">Enter the person's first name.</div>
+											</div>
+											<div class="col-md-6 mb-3">
+												<label for="lastName" class="form-label">Last Name</label>
+                        						<input type="text" id="lastName" name="lastName" aria-describedby="lastNameHelp" maxlength="35" value="<?php echo( isset( $lastName ) ) ? $lastName : ''; ?>" class="form-control <?php if ( isset( $lastNameErr ) ) { echo( $lastNameErr == true ) ? 'is-invalid' : 'is-valid'; } ?>" >
+                        						<div id="lastNameHelp" class="form-text">Enter the person's last name.</div>
+											</div>
 										</div>
 									</div>
 								</div>
