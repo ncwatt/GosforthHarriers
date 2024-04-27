@@ -25,6 +25,7 @@ if ( ! function_exists( 'ghac_setup' ) ) :
     register_nav_menus(
       array (
         'top-menu' => __('Top Menu', 'ghac'),
+        'top-menu-admin' => __('Top Menu Admin', 'ghac'),
         'useful-links' => __('Useful Links', 'ghac')
       )
     );
@@ -56,8 +57,6 @@ if ( ! function_exists( 'form_input_checks' ) ) :
   }
 endif;
 
-
-
 if ( ! function_exists( 'get_pageid_by_pageslug' ) ):
   function get_pageid_by_pageslug( $page_slug ) {
     $page = get_page_by_path( $page_slug );
@@ -74,7 +73,28 @@ if ( ! function_exists( 'get_page_permalink_by_pageslug' ) ):
   }
 endif;
 
-if ( ! function_exists( 'get_frontpage_feature') ):
+/** ********************************************************************
+ * 
+ *  User functions
+ *  
+ * *********************************************************************
+ */ 
+
+if ( ! function_exists( 'is_user_in_role' ) ) :
+  function is_user_in_role( $role ) {
+    $user = wp_get_current_user();
+    return ( in_array( 'administrator', array_map( fn($str) => strtolower( $str ), (array) $user->roles ) ) ? true : false );
+  }
+endif;
+
+/** ********************************************************************
+ * 
+ *  Frontpage functions
+ *  
+ * *********************************************************************
+ */ 
+
+if ( ! function_exists( 'get_frontpage_feature') ) :
   function get_frontpage_feature( $col ) {
     $feature = get_page_by_path( 'front-page/feature-' . $col, OBJECT, [ 'page' ] );
     if ( ! empty( $feature ) ):
@@ -89,7 +109,13 @@ if ( ! function_exists( 'get_frontpage_feature') ):
   }
 endif;
 
-/* WooCommerce */
+/** ********************************************************************
+ * 
+ * WooCommerce functions
+ *  
+ * *********************************************************************
+ */ 
+
 function wc_override_checkout_fields( $fields ) {
   $fields['billing']['billing_company']['placeholder'] = 'Running club required when entering events';
   $fields['billing']['billing_company']['label']       = 'Club name';
@@ -97,7 +123,6 @@ function wc_override_checkout_fields( $fields ) {
   return $fields;
 }
 add_filter( 'woocommerce_checkout_fields' , 'wc_override_checkout_fields' );
-
 
 function wc_form_field_args($args, $key, $value) {
   $args['input_class'] = array( 'form-control' );
