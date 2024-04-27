@@ -2,10 +2,6 @@
 /*
 	Template Name: Summer Relays - Teams List
 */
-
-// Determine if the user is an administrator or not
-$user = wp_get_current_user();
-if ( in_array( 'administrator', array_map( fn($str) => strtolower( $str ), (array) $user->roles ) ) ) { $isAdmin = true; } else { $isAdmin = false; }
 ?>
 <?php get_header(); ?>
 <div class="content-1">
