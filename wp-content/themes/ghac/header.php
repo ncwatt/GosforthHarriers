@@ -15,15 +15,31 @@
             </button>
             <div class="collapse navbar-collapse" id="topMenu" style="padding: 0 0 0 80px;">
                 <?php
-                    wp_nav_menu(array(
-                        'theme_location' => 'top-menu',
-                        'container' => false,
-                        'menu_class' => '',
-                        'fallback_cb' => '__return_false',
-                        'items_wrap' => '<ul id="%1$s" class="navbar-nav me-auto mb-2 mb-md-0 %2$s">%3$s</ul>',
-                        'depth' => 2,
-                        'walker' => new bootstrap_5_wp_nav_menu_walker()
-                    ));
+                    if ( is_user_in_role( 'administrator' ) ) {
+                        wp_nav_menu( 
+                            array(
+                                'theme_location' => 'top-menu-admin',
+                                'container' => false,
+                                'menu_class' => '',
+                                'fallback_cb' => '__return_false',
+                                'items_wrap' => '<ul id="%1$s" class="navbar-nav me-auto mb-2 mb-md-0 %2$s">%3$s</ul>',
+                                'depth' => 2,
+                                'walker' => new bootstrap_5_wp_nav_menu_walker()
+                            )
+                        );
+                    } else {
+                        wp_nav_menu( 
+                            array(
+                                'theme_location' => 'top-menu',
+                                'container' => false,
+                                'menu_class' => '',
+                                'fallback_cb' => '__return_false',
+                                'items_wrap' => '<ul id="%1$s" class="navbar-nav me-auto mb-2 mb-md-0 %2$s">%3$s</ul>',
+                                'depth' => 2,
+                                'walker' => new bootstrap_5_wp_nav_menu_walker()
+                            )
+                        );
+                    }
                 ?>
             </div>
         </div>
