@@ -49,6 +49,11 @@ body {
   font-family: "PT Sans", sans-serif;
 }
 
+.btn-primary {
+  background-color: #92d884;
+  border-color: #92d884;
+}
+
 a.club-button, a.club-button:active, a.club-button:link, a.club-button:visited {
   border-radius: 40px;
   display: block;
@@ -91,6 +96,11 @@ a.club-button-2 {
 a.club-button-2:hover {
   background-color: #ffffff;
   color: #92d884;
+}
+
+button.icon-button, button.icon-button:active, button.icon-button:hover, button.icon-button:link, button.icon-button:visited {
+  color: #4d4d4d !important;
+  padding: 0;
 }
 
 h1 {
