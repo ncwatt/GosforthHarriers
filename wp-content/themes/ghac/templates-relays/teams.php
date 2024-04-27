@@ -2,6 +2,10 @@
 /*
 	Template Name: Summer Relays - Teams List
 */
+
+// Determine if the user is an administrator or not
+$user = wp_get_current_user();
+if ( in_array( 'administrator', array_map( fn($str) => strtolower( $str ), (array) $user->roles ) ) ) { $isAdmin = true; } else { $isAdmin = false; }
 ?>
 <?php get_header(); ?>
 <div class="content-1">
@@ -9,6 +13,9 @@
 		<div class="row">
 			<div class="col-12">
 				<h1><?php the_title(); ?></h1>
+				<?php if ( $isAdmin == true ) : ?>
+					<a href="<?php echo get_page_permalink_by_pageslug( 'summer-relays/add-team' ) ?>" class="btn btn-primary">Add Team</a>
+				<?php endif; ?>
 				<table class="table">
 					<thead>
     					<tr>
