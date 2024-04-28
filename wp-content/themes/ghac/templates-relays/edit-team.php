@@ -35,7 +35,6 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 	if ( isset( $_POST['editTeamForm'] ) ) {
 		// Get the values from the form
 		$teamNum = isset( $_POST['teamNumber'] ) ? form_input_checks( $_POST['teamNumber'] ) : null;
-		$teamNumAuto = isset( $_POST['teamNumberAuto'] ) ? true : false;
 		$teamName = form_input_checks( $_POST['teamName'] );
 		$category = form_input_checks( $_POST["category"] );
 		$clubName = form_input_checks( $_POST['clubName'] );
@@ -45,7 +44,9 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 		$runnerBURN = form_input_checks( $_POST['runnerBURN'] );
 		$runnerCName = form_input_checks( $_POST['runnerCName'] );
 		$runnerCURN = form_input_checks( $_POST['runnerCURN'] );
-		//$email = form_input_checks( $_POST["emailAddress"] );
+		$firstName = form_input_checks( $_POST["firstName"] );
+		$lastName = form_input_checks( $_POST["lastName"] );
+		$email = form_input_checks( $_POST["emailAddress"] );
 
 		// Loop through all posted items from the form to see if any refer to deleting an email address
 		foreach ( $_POST as $postItemName => $postItemValue ) {
@@ -60,6 +61,85 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 			}
 		}
 
+		// Only process this if the add contact button has been clicked
+		if ( isset( $_POST['submitContact'] ) ) {
+			// Set contactSuccess to true - this will get set to false during validation if a value fails
+			$contactSuccess = true;
+			$errors = array();
+
+			// Validate the first name
+			$firstNameErr = false;
+			if ( ! ( strlen( $firstName ) > 0 && strlen( $firstName ) <= 35 ) ) {
+				$firstNameErr = true;
+				$errors[] = 'You have not entered the first name of the new club contact';
+				$contactSuccess = false;
+			}
+
+			// Validate the last name
+			$lastNameErr = false;
+			if ( ! ( strlen( $lastName ) > 0 && strlen( $lastName ) <= 35 ) ) {
+				$lastNameErr = true;
+				$errors[] = 'You have not entered the last name of the new lub contact';
+				$contactSuccess = false;
+			}
+
+			// Validate email address
+			$emailErr = false;
+        	if ( ! ( strlen( $email ) > 0 ) ) {
+				$emailErr = true;
+				$errors[] = 'You have not entered the email address of the new club contact';
+				$contactSuccess = false;
+			} elseif ( ! filter_var( $email, FILTER_VALIDATE_EMAIL ) ) { 
+            	$emailErr = true;
+				$errors[] = 'The email address entered is not valid';
+            	$contactSuccess = false;
+        	}
+
+			if ( $contactSuccess ) {
+				// Check if the email address is already in the table
+				$emailID = $wpdb->get_var( $wpdb->prepare( "SELECT EmailID FROM {$wpdb->prefix}ghac_c_emails WHERE EmailAddress = %s", $email ) );
+				if ( ! isset( $emailID ) ) {
+					// Insert the email into the table
+					$wpdb->insert( "{$wpdb->prefix}ghac_c_emails", array(
+						'EmailAddress' => $email,
+						'FirstName' => $firstName,
+						'LastName' => $lastName
+					) );
+					// Get the emailID for the newly inserted record
+					$emailID = $wpdb->insert_id;
+				} else {
+					// Update the name and last name for the email address supplied
+					$wpdb->update( 
+						"{$wpdb->prefix}ghac_c_emails", 
+						array(
+							'FirstName' => $firstName,
+							'LastName' => $lastName
+						),
+						array(
+							'EmailID' => $emailID
+						)
+					);
+				}
+	
+				// Insert link the team and the email address
+				$wpdb->insert( "{$wpdb->prefix}ghac_c_teamemails", 
+					array(
+						'TeamID' => $teamID,
+						'EmailID' => $emailID
+					) 
+				);
+
+				// Reset the add contact values
+				$firstName = "";
+				$firstNameErr = null;
+				$lastName = "";
+				$lastNameErr = null;
+				$email = "";
+				$emailErr = null;
+				$contactSuccess = null;
+			}
+		}
+
 		// Only process this if the submit (save changes) button has been clicked
 		if ( isset( $_POST['submit'] ) ) {
 			// Set postSuccess to true - this will get set to false during validation if a value fails
@@ -68,9 +148,9 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 	
 			// Validate team number
 			$teamNumErr = false;
-			$team_query = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ghac_c_teams WHERE TeamNumber = %d", $teamNum );
+			$team_query = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ghac_c_teams WHERE TeamNumber = %d AND TeamID <> %d", array( $teamNum, $teamID ) );
 			$team_results = $wpdb->get_results( $team_query );
-			if ( !empty( $team_results ) ) {
+			if ( ! empty( $team_results ) ) {
 				$teamNumErr = true;
 				$errors[] = 'The team number you enetered is already in use';
 				$postSuccess = false;
@@ -82,7 +162,7 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 			
 			// Validate team name
 			$teamNameErr = false;
-			$team_query = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ghac_c_teams WHERE TeamName = %s", $teamName );
+			$team_query = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ghac_c_teams WHERE TeamName = %s AND TeamID <> %d", array( $teamName, $teamID ) );
 			$team_results = $wpdb->get_results( $team_query );
 			if ( !empty( $team_results ) ) {
 				$teamNameErr = true;
@@ -98,64 +178,26 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 				$postSuccess = false;
 			}
 	
-			// Validate email address
-			$emailErr = false;
-			if ( ! ( strlen( $email ) > 0 ) ) {
-				$emailErr = true;
-				$errors[] = 'You have not entered the email address of the club contact used during registration';
-				$postSuccess = false;
-			} elseif ( ! filter_var( $email, FILTER_VALIDATE_EMAIL ) ) { 
-				$emailErr = true;
-				$errors[] = 'The email address entered is not valid';
-				$postSuccess = false;
-			}
-	
 			if ( $postSuccess ) {
-				if ( ! isset( $teamNum ) ) {
-					// A team number hasn't been entered therefore we need to generate one
-					$teamNum = $wpdb->get_var( $wpdb->prepare( "SELECT MAX(TeamNumber) FROM {$wpdb->prefix}ghac_c_teams" ) );
-					if ( isset( $teamNum ) ) {
-						$teamNum = $teamNum + 1;
-					} else {
-						$teamNum = 1;
-					}
-				}
-	
-				if ( empty( $teamName ) ) {
-					// A team name hasn't been entered therefore we need to generate one
-					$teamName = 'Team #' . $teamNum;
-				}
-	
-				// Insert the team into the table
-				$wpdb->insert( "{$wpdb->prefix}ghac_c_teams", array(
-					'TeamNumber' => $teamNum,
-					'TeamName' => $teamName,
-					'Category' => $category, 
-					'ClubName' => $clubName
-				) );
-				$teamID = $wpdb->insert_id;
-	
-				// Check if the email address is already in the table
-				$emailID = $wpdb->get_var( $wpdb->prepare( "SELECT EmailID FROM {$wpdb->prefix}ghac_c_emails WHERE EmailAddress = %s", $email ) );
-				if ( ! isset( $emailID ) ) {
-					// Insert the email into the table
-					$wpdb->insert( "{$wpdb->prefix}ghac_c_emails", array(
-						'EmailAddress' => $email
-					) );
-					// Get the emailID for the newly inserted record
-					$emailID = $wpdb->insert_id;
-				}
-	
-				// Insert link the team and the email address
-				$wpdb->insert( "{$wpdb->prefix}ghac_c_teamemails", array(
-					'TeamID' => $teamID,
-					'EmailID' => $emailID
-				) );
-	
-				// Everything went to plan so let's redirect to the edit page for this team
-				wp_redirect( get_page_permalink_by_pageslug( 'summer-relays/edit-team' ) . '?teamid=' . $teamID );
-				//header('Location: ' . get_page_permalink_by_pageslug( 'summer-relays/edit-team' ) . '?teamid=' . $wpdb->insert_id);
-				exit;
+				// Update the values
+				$wpdb->update( 
+					"{$wpdb->prefix}ghac_c_teams", 
+					array(
+						'TeamNumber' => $teamNum,
+						'TeamName' => $teamName,
+						'ClubName' => $clubName,
+						'Category' => $category,
+						'RunnerA' => $runnerAName,
+						'RunnerB' => $runnerBName,
+						'RunnerC' => $runnerCName
+					),
+					array(
+						'TeamID' => $teamID
+					)
+				);
+
+				// Redirect back to the teams manager page
+				wp_redirect( get_page_permalink_by_pageslug( 'summer-relays/teams-manager' ) );
 			}
 		}
 	}
@@ -173,7 +215,7 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
                     </div>
 				<?php else: ?>
 					<h1><?php the_title(); ?></h1>
-					<?php if ( ( isset( $postSuccess ) ) && ( $postSuccess == false ) ) : ?>
+					<?php if ( ( ( isset( $postSuccess ) ) && ( $postSuccess == false ) ) || ( ( isset( $contactSuccess ) ) && ( $contactSuccess == false ) ) ) : ?>
                     	<div class="alert alert-danger" role="alert">
                         	<p>There are errors on the form. Please correct the following and re-submit:</p>
 							<ul>
@@ -194,18 +236,7 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 									<div class="card-body">
 										<div class="mb-3">
                         					<label for="teamNumber" class="form-label">Team Number</label>
-                        					<div class="input-group">
-                            					<input type="number" id="teamNumber" name="teamNumber" aria-describedby="teamNumberHelp" <?php if ( isset( $teamNumAuto ) ) { echo ( $teamNumAuto == true ) ? 'disabled' : ''; } ?> value="<?php echo( isset( $teamNum ) ) ? $teamNum : ''; ?>" class="form-control <?php if ( isset( $teamNumErr ) ) { echo( $teamNumErr == true ) ? 'is-invalid' : 'is-valid'; } ?>">
-                            					<div class="input-group-text">
-                                					<input type="checkbox" id="teamNumberAuto" name="teamNumberAuto" <?php if ( isset( $teamNumAuto ) ) { echo ( $teamNumAuto == true ) ? 'checked' : ''; } ?> value="teamNumberAuto" aria-label="Check to automatically generate team number" class="form-check-input mt-0" onclick="teamNumberToggle(this.checked)">
-                            					</div>
-												<script>
-													function teamNumberToggle(checked) {
-														document.getElementById('teamNumber').value = '';
-														document.getElementById('teamNumber').disabled = checked;
-													}
-												</script>
-                        					</div>
+											<input type="number" id="teamNumber" name="teamNumber" aria-describedby="teamNumberHelp" value="<?php echo( isset( $teamNum ) ) ? $teamNum : ''; ?>" class="form-control <?php if ( isset( $teamNumErr ) ) { echo( $teamNumErr == true ) ? 'is-invalid' : 'is-valid'; } ?>">
                         					<div id="teamNumberHelp" class="form-text">Enter the team number which will appear on the runners' bibs. If it is not known at this stage select the checkbox to automatically generate a number for now. This can be changed later.</div>
                     					</div>
 										<div class="mb-3">
@@ -245,13 +276,15 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 								</div>
 								<div class="card mb-3">
 									<div class="card-header">
-										Admin Email Addresses
+										Club Contacts
 									</div>
 									<div class="card-body">
 										<div class="mb-3">
 											<table class="table">
 												<thead>
     												<tr>
+														<th scope="col">First Name</th>
+														<th scope="col">Last Name</th>
       													<th scope="col">Email Address</th>
 														<th scope="col"></th>
     												</tr>
@@ -262,6 +295,8 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 														foreach($emailAddresses as $emailRow) {
 													?>
 														<tr>
+															<td><?php echo $emailRow->FirstName; ?></td>
+															<td><?php echo $emailRow->LastName; ?></td>
 															<td><?php echo $emailRow->EmailAddress; ?></td>
 															<td>
 																<span class="float-end"><button type="button" class="btn btn-link bi bi-trash3 icon-button" data-bs-toggle="modal" data-bs-target="#modalDelEmail<?php echo $emailRow->EmailID; ?>"></button></span>
@@ -292,11 +327,45 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 													?>
 												</tbody>
 											</table>
+											<div class="mb-3">
+												<button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addContact" aria-expanded="false" aria-controls="addContact">
+    												Add Contact
+  												</button>
+											</div>
+											<div class="<?php echo( isset( $contactSuccess ) ) ? 'collapse show' : 'collapse'; ?>" id="addContact">
+												<div class="card mb-3">
+													<div class="card-body">
+														<div class="mb-3">
+															<div class="row">
+																<div class="col-md-6 mb-3">
+																	<label for="firstName" class="form-label">First Name</label>
+                        											<input type="text" id="firstName" name="firstName" aria-describedby="firstNameHelp" maxlength="35" value="<?php echo( isset( $firstName ) ) ? $firstName : ''; ?>" class="form-control <?php if ( isset( $firstNameErr ) ) { echo( $firstNameErr == true ) ? 'is-invalid' : 'is-valid'; } ?>" >
+                        											<div id="firstNameHelp" class="form-text">Enter the club contact's first name.</div>
+																</div>
+																<div class="col-md-6 mb-3">
+																	<label for="lastName" class="form-label">Last Name</label>
+                        											<input type="text" id="lastName" name="lastName" aria-describedby="lastNameHelp" maxlength="35" value="<?php echo( isset( $lastName ) ) ? $lastName : ''; ?>" class="form-control <?php if ( isset( $lastNameErr ) ) { echo( $lastNameErr == true ) ? 'is-invalid' : 'is-valid'; } ?>" >
+                        											<div id="lastNameHelp" class="form-text">Enter the club contact's last name.</div>
+																</div>
+															</div>
+															<div class="row">
+																<div class="mb-3">
+																	<label for="emailAddress" class="form-label">Email address</label>
+                        											<input type="email" id="emailAddress" name="emailAddress" aria-describedby="emailAddressHelp" maxlength="254" value="<?php echo( isset( $email ) ) ? $email : ''; ?>" class="form-control <?php if ( isset( $emailErr ) ) { echo( $emailErr == true ) ? 'is-invalid' : 'is-valid'; } ?>" >
+                        											<div id="emailAddressHelp" class="form-text">Enter the email address of the club contact.</div>
+																</div>
+															</div>
+															<div class="row">
+																<div class="col">
+																	<button type="submit" name="submitContact" value="submitContact" class="btn btn-primary">Submit</button>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
 										</div>
 									</div>
-									<div class="card-footer text-body-secondary">
-    2 days ago
-  </div>
 								</div>
 							</div>
 						</div>
