@@ -54,18 +54,6 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
             $postSuccess = false;
         }
 
-		// Validate email address
-		$emailErr = false;
-        if ( ! ( strlen( $email ) > 0 ) ) {
-			$emailErr = true;
-			$errors[] = 'You have not entered the email address of the club contact used during registration';
-			$postSuccess = false;
-		} elseif ( ! filter_var( $email, FILTER_VALIDATE_EMAIL ) ) { 
-            $emailErr = true;
-			$errors[] = 'The email address entered is not valid';
-            $postSuccess = false;
-        }
-
 		// Validate the first name
 		$firstNameErr = false;
 		if ( ! ( strlen( $firstName ) > 0 && strlen( $firstName ) <= 35 ) ) {
@@ -81,6 +69,18 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 			$errors[] = 'You have not entered the last name of the club contact';
 			$postSuccess = false;
 		}
+
+		// Validate email address
+		$emailErr = false;
+        if ( ! ( strlen( $email ) > 0 ) ) {
+			$emailErr = true;
+			$errors[] = 'You have not entered the email address of the club contact used during registration';
+			$postSuccess = false;
+		} elseif ( ! filter_var( $email, FILTER_VALIDATE_EMAIL ) ) { 
+            $emailErr = true;
+			$errors[] = 'The email address entered is not valid';
+            $postSuccess = false;
+        }
 
 		if ( $postSuccess ) {
 			if ( ! isset( $teamNum ) ) {
@@ -225,22 +225,22 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
                         					<input type="text" id="clubName" name="clubName" aria-describedby="clubNameHelp" maxlength="75" value="<?php echo( isset( $clubName ) ) ? $clubName : ''; ?>" class="form-control <?php if ( isset( $clubNameErr ) ) { echo( $clubNameErr == true ) ? 'is-invalid' : 'is-valid'; } ?>" >
                         					<div id="clubNameHelp" class="form-text">Enter the name of the running club to associate this team with.</div>
 										</div>
-										<div class="mb-3">
-											<label for="emailAddress" class="form-label">Email address</label>
-                        					<input type="email" id="emailAddress" name="emailAddress" aria-describedby="emailAddressHelp" maxlength="254" value="<?php echo( isset( $email ) ) ? $email : ''; ?>" class="form-control <?php if ( isset( $emailErr ) ) { echo( $emailErr == true ) ? 'is-invalid' : 'is-valid'; } ?>" >
-                        					<div id="emailAddressHelp" class="form-text">Enter the email address of the club contact used during registration. Additional email addresses can be added later.</div>
-										</div>
 										<div class="row">
 											<div class="col-md-6 mb-3">
 												<label for="firstName" class="form-label">First Name</label>
                         						<input type="text" id="firstName" name="firstName" aria-describedby="firstNameHelp" maxlength="35" value="<?php echo( isset( $firstName ) ) ? $firstName : ''; ?>" class="form-control <?php if ( isset( $firstNameErr ) ) { echo( $firstNameErr == true ) ? 'is-invalid' : 'is-valid'; } ?>" >
-                        						<div id="firstNameHelp" class="form-text">Enter the person's first name.</div>
+                        						<div id="firstNameHelp" class="form-text">Enter the club contact's first name.</div>
 											</div>
 											<div class="col-md-6 mb-3">
 												<label for="lastName" class="form-label">Last Name</label>
                         						<input type="text" id="lastName" name="lastName" aria-describedby="lastNameHelp" maxlength="35" value="<?php echo( isset( $lastName ) ) ? $lastName : ''; ?>" class="form-control <?php if ( isset( $lastNameErr ) ) { echo( $lastNameErr == true ) ? 'is-invalid' : 'is-valid'; } ?>" >
-                        						<div id="lastNameHelp" class="form-text">Enter the person's last name.</div>
+                        						<div id="lastNameHelp" class="form-text">Enter the club contact's last name.</div>
 											</div>
+										</div>
+										<div class="mb-3">
+											<label for="emailAddress" class="form-label">Email address</label>
+                        					<input type="email" id="emailAddress" name="emailAddress" aria-describedby="emailAddressHelp" maxlength="254" value="<?php echo( isset( $email ) ) ? $email : ''; ?>" class="form-control <?php if ( isset( $emailErr ) ) { echo( $emailErr == true ) ? 'is-invalid' : 'is-valid'; } ?>" >
+                        					<div id="emailAddressHelp" class="form-text">Enter the email address of the club contact used during registration. Additional email addresses can be added later.</div>
 										</div>
 									</div>
 								</div>
