@@ -11,7 +11,7 @@
     )
   );
 ?>
-<div id="frontPageCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-pause="false">
+<div id="frontPageCarousel" class="carousel slide carousel-fade d-none d-sm-block" data-bs-ride="carousel" data-bs-pause="false">
   <div class="carousel-inner">
     <?php
       $slider_active = ' active';

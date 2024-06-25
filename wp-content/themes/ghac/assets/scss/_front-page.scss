@@ -1,12 +1,21 @@
 .features {
-    /*background-color: $color1;*/
-    /*padding: 0 0 3em 0;*/
     text-align: center;
 
-    .feature {
-        margin-top: -200px;
-        z-index: 9999;
+    @media screen and (max-width: 575px) {
+        margin-top: -50px;
+    }
 
+    .feature {
+        @media screen and (max-width: 575px) {
+            margin-top: 40px;
+            z-index: 9999;
+        }
+
+        @media screen and (min-width: 576px) {
+            margin-top: -200px;
+            z-index: 9999;
+        }
+        
         a.club-button {
             margin-top: 2em;
             margin-bottom: 2em;
