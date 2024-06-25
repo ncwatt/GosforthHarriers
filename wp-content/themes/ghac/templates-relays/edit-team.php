@@ -24,11 +24,14 @@ if ( $_SERVER["REQUEST_METHOD"] == "GET" ) {
 	$clubName = $team->ClubName;
 	$category = $team->Category;
 	$runnerAName = $team->RunnerA;
-	$runnerAURN = $team->RunnerAURN;
+	$runnerATime = $team->RunnerATime;
+	$runnerALegTime = $team->RunnerALegTime;
 	$runnerBName = $team->RunnerB;
-	$runnerBURN = $team->RunnerBURN;
+	$runnerBTime = $team->RunnerBTime;
+	$runnerBLegTime = $team->RunnerBLegTime;
 	$runnerCName = $team->RunnerC;
-	$runnerCURN = $team->RunnerCURN;
+	$runnerCTime = $team->RunnerCTime;
+	$runnerCLegTime = $team->RunnerCTime;
 }
 
 if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
@@ -39,11 +42,14 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 		$category = form_input_checks( $_POST["category"] );
 		$clubName = form_input_checks( $_POST['clubName'] );
 		$runnerAName = form_input_checks( $_POST['runnerAName'] );
-		$runnerAURN = form_input_checks( $_POST['runnerAURN'] );
+		$runnerATime = form_input_checks( $_POST['runnerATime'] );
+		$runnerALegTime = form_input_checks( $_POST['runnerALegTime'] );
 		$runnerBName = form_input_checks( $_POST['runnerBName'] );
-		$runnerBURN = form_input_checks( $_POST['runnerBURN'] );
+		$runnerBTime = form_input_checks( $_POST['runnerBTime'] );
+		$runnerBLegTime = form_input_checks( $_POST['runnerBLegTime'] );
 		$runnerCName = form_input_checks( $_POST['runnerCName'] );
-		$runnerCURN = form_input_checks( $_POST['runnerCURN'] );
+		$runnerCTime = form_input_checks( $_POST['runnerCTime'] );
+		$runnerCLegTime = form_input_checks( $_POST['runnerCLegTime'] );
 		$firstName = form_input_checks( $_POST["firstName"] );
 		$lastName = form_input_checks( $_POST["lastName"] );
 		$email = form_input_checks( $_POST["emailAddress"] );
@@ -178,6 +184,29 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 				$postSuccess = false;
 			}
 	
+			// Validate Runner B time
+			$runnerBTimeErr = false;
+			if ( ( date( 'H:i:s', strtotime( $runnerBTime ) ) != '00:00:00' ) && ( strtotime( $runnerBTime ) <= strtotime( $runnerATime ) ) ) {
+				$runnerBTimeErr = true;
+				$errors[] = 'Runner B\'s time is less than or equal to Runner A\'s';
+				$postSuccess = false;
+			}
+
+			// Validate Runner C time
+			$runnerCTimeErr = false;
+			if ( ( date( 'H:i:s', strtotime( $runnerCTime ) ) != '00:00:00' ) && ( strtotime( $runnerCTime ) <= strtotime( $runnerATime ) || strtotime( $runnerCTime ) <= strtotime( $runnerBTime ) ) ) {
+				$runnerCTimeErr = true;
+				$errors[] = 'Runner C\'s time is less than one of the other runner\'s times';
+				$postSuccess = false;
+			}
+
+			// Update the leg times
+			$runnerALegTime = $runnerATime;
+			$runnerBLegTime = gmdate( "H:i:s", strtotime( $runnerBTime ) - strtotime( $runnerATime ) );
+			//gmdate("H:i:s", $seconds);
+			echo $runnerBLegTime;
+			$runnerCLegTime = gmdate( "H:i:s", strtotime( $runnerCTime ) - strtotime( $runnerBTime ) - strtotime( $runnerATime ) );
+
 			if ( $postSuccess ) {
 				// Update the values
 				$wpdb->update( 
@@ -188,8 +217,14 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 						'ClubName' => $clubName,
 						'Category' => $category,
 						'RunnerA' => $runnerAName,
+						'RunnerATime' => $runnerATime,
+						'RunnerALegTime' => $runnerALegTime,
 						'RunnerB' => $runnerBName,
-						'RunnerC' => $runnerCName
+						'RunnerBTime' => $runnerBTime,
+						'RunnerBLegTime' => $runnerBLegTime,
+						'RunnerC' => $runnerCName,
+						'RunnerCTime' => $runnerCTime,
+						'RunnerCLegTime' => $runnerCLegTime
 					),
 					array(
 						'TeamID' => $teamID
@@ -382,9 +417,13 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
                         					<div id="runnerANameHelp" class="form-text">Enter the name of the runner for the first leg.</div>
 										</div>
 										<div class="mb-3">
-											<label for="runnerAURN" class="form-label">UKA URN</label>
-                        					<input type="number" id="runnerAURN" name="runnerAURN" aria-describedby="runnerAURNHelp" maxlength="60" value="<?php echo( isset( $runnerAURN ) ) ? $runnerAURN : ''; ?>" class="form-control <?php if ( isset( $runnerAURNErr ) ) { echo( $runnerAURNErr == true ) ? 'is-invalid' : 'is-valid'; } ?>">
-                        					<div id="runnerANameHelp" class="form-text">Enter the UK Athletics URN for the runner for the first leg.</div>
+											<label for="runnerATime" class="form-label">Gun Time</label>
+                        					<input type="time" id="runnerATime" name="runnerATime" aria-describedby="runnerATimeHelp" step="1" value="<?php echo( isset( $runnerATime ) ) ? $runnerATime : ''; ?>" class="form-control <?php if ( isset( $runnerATimeErr ) ) { echo( $runnerATimeErr == true ) ? 'is-invalid' : 'is-valid'; } ?>">
+                        					<div id="runnerATimeHelp" class="form-text">Enter the gun time for the runner of the first leg.</div>
+										</div>
+										<div class="mb-3">
+											<input type="hidden" name="runnerALegTime" value="<?php echo( isset( $runnerALegTime ) ) ? $runnerALegTime : ''; ?>">
+											<p>Leg Time: <?php echo $runnerALegTime; ?></p>
 										</div>
 									</div>
 								</div>
@@ -401,9 +440,13 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
                         					<div id="runnerBNameHelp" class="form-text">Enter the name of the runner for the second leg.</div>
 										</div>
 										<div class="mb-3">
-											<label for="runnerBURN" class="form-label">UKA URN</label>
-                        					<input type="number" id="runnerBURN" name="runnerBURN" aria-describedby="runnerBURNHelp" maxlength="60" value="<?php echo( isset( $runnerBURN ) ) ? $runnerBURN : ''; ?>" class="form-control <?php if ( isset( $runnerBURNErr ) ) { echo( $runnerBURNErr == true ) ? 'is-invalid' : 'is-valid'; } ?>">
-                        					<div id="runnerANameHelp" class="form-text">Enter the UK Athletics URN for the runner for the second leg.</div>
+											<label for="runnerBTime" class="form-label">Gun Time</label>
+                        					<input type="time" id="runnerBTime" name="runnerBTime" aria-describedby="runnerBTimeHelp" step="1" value="<?php echo( isset( $runnerBTime ) ) ? $runnerBTime : ''; ?>" class="form-control <?php if ( isset( $runnerBTimeErr ) ) { echo( $runnerBTimeErr == true ) ? 'is-invalid' : 'is-valid'; } ?>">
+                        					<div id="runnerBTimeHelp" class="form-text">Enter the gun time for the runner of the second leg.</div>
+										</div>
+										<div class="mb-3">
+											<input type="hidden" name="runnerBLegTime" value="<?php echo( isset( $runnerBLegTime ) ) ? $runnerBLegTime : ''; ?>">
+											<p>Leg Time: <?php echo $runnerBLegTime; ?></p>
 										</div>
 									</div>
 								</div>
@@ -422,9 +465,13 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
                         					<div id="runnerCNameHelp" class="form-text">Enter the name of the runner for the last leg.</div>
 										</div>
 										<div class="mb-3">
-											<label for="runnerCURN" class="form-label">UKA URN</label>
-                        					<input type="number" id="runnerCURN" name="runnerCURN" aria-describedby="runnerCURNHelp" maxlength="60" value="<?php echo( isset( $runnerCURN ) ) ? $runnerCURN : ''; ?>" class="form-control <?php if ( isset( $runnerCURNErr ) ) { echo( $runnerCURNErr == true ) ? 'is-invalid' : 'is-valid'; } ?>">
-                        					<div id="runnerCNameHelp" class="form-text">Enter the UK Athletics URN for the runner for the last leg.</div>
+											<label for="runnerCTime" class="form-label">Gun Time</label>
+                        					<input type="time" id="runnerCTime" name="runnerCTime" aria-describedby="runnerCTimeHelp" step="1" value="<?php echo( isset( $runnerCTime ) ) ? $runnerCTime : ''; ?>" class="form-control <?php if ( isset( $runnerCTimeErr ) ) { echo( $runnerCTimeErr == true ) ? 'is-invalid' : 'is-valid'; } ?>">
+                        					<div id="runnerCTimeHelp" class="form-text">Enter the gun time for the runner of the third leg.</div>
+										</div>
+										<div class="mb-3">
+											<input type="hidden" name="runnerCLegTime" value="<?php echo( isset( $runnerCLegTime ) ) ? $runnerCLegTime : ''; ?>">
+											<p>Leg Time: <?php echo $runnerCLegTime; ?></p>
 										</div>
 									</div>
 								</div>
