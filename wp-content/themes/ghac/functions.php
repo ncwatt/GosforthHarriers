@@ -35,7 +35,7 @@ add_action( 'after_setup_theme', 'ghac_setup' );
 
 if ( ! function_exists( 'ghac_load_stylesheets' ) ) :
   function ghac_load_stylesheets() {
-    wp_enqueue_style( 'styles', get_template_directory_uri() . '/assets/css/styles.min.css', '', '0.1.6', 'all' );
+    wp_enqueue_style( 'styles', get_template_directory_uri() . '/assets/css/styles.min.css', '', '0.1.7', 'all' );
   }
 endif;
 add_action( 'wp_enqueue_scripts', 'ghac_load_stylesheets' );

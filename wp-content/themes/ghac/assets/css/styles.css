@@ -2,6 +2,58 @@
 @import url("https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Heebo:wght@100..900&display=swap");
+@media screen and (max-width: 991px) {
+  .navbar .navbar-logo {
+    height: auto;
+    margin: 0 0 0 0;
+    position: static;
+    width: 60px;
+    z-index: 9999;
+  }
+}
+@media screen and (min-width: 992px) {
+  .navbar .navbar-logo {
+    height: auto;
+    margin: -25px 0 0 0;
+    position: absolute;
+    width: 90px;
+    z-index: 9999;
+  }
+}
+.features {
+  text-align: center;
+}
+@media screen and (max-width: 575px) {
+  .features {
+    margin-top: -50px;
+  }
+}
+@media screen and (max-width: 575px) {
+  .features .feature {
+    margin-top: 40px;
+    z-index: 9999;
+  }
+}
+@media screen and (min-width: 576px) {
+  .features .feature {
+    margin-top: -200px;
+    z-index: 9999;
+  }
+}
+.features .feature a.club-button {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+.features .feature hr {
+  background-image: linear-gradient(to right, #ffffff, #92d884, #92d884, #92d884, #ffffff);
+  border: 0;
+  height: 2px;
+  /*margin: 0 0 0 0;*/
+}
+.features .feature img {
+  padding: 0 0 2em 0;
+}
+
 body {
   background: #92d884;
   color: #4d4d4d;
@@ -86,58 +138,6 @@ h6 {
 .content-4 {
   background-color: #dfdfdf;
   padding: 3em 0 3em 0;
-}
-
-@media screen and (max-width: 991px) {
-  .navbar .navbar-logo {
-    height: auto;
-    margin: 0 0 0 0;
-    position: static;
-    width: 60px;
-    z-index: 9999;
-  }
-}
-@media screen and (min-width: 992px) {
-  .navbar .navbar-logo {
-    height: auto;
-    margin: -25px 0 0 0;
-    position: absolute;
-    width: 90px;
-    z-index: 9999;
-  }
-}
-.features {
-  text-align: center;
-}
-@media screen and (max-width: 575px) {
-  .features {
-    margin-top: -50px;
-  }
-}
-@media screen and (max-width: 575px) {
-  .features .feature {
-    margin-top: 40px;
-    z-index: 9999;
-  }
-}
-@media screen and (min-width: 576px) {
-  .features .feature {
-    margin-top: -200px;
-    z-index: 9999;
-  }
-}
-.features .feature a.club-button {
-  margin-top: 2em;
-  margin-bottom: 2em;
-}
-.features .feature hr {
-  background-image: linear-gradient(to right, #ffffff, #92d884, #92d884, #92d884, #ffffff);
-  border: 0;
-  height: 2px;
-  /*margin: 0 0 0 0;*/
-}
-.features .feature img {
-  padding: 0 0 2em 0;
 }
 
 .footer {
