@@ -66,6 +66,30 @@ class WC_REST_Product_Variations_Controller extends WC_REST_Product_Variations_V
 	}
 
 	/**
+	 * Get the downloads for a product variation.
+	 *
+	 * @param WC_Product_Variation $product Product variation instance.
+	 * @param string               $context Context of the request: 'view' or 'edit'.
+	 *
+	 * @return array
+	 */
+	protected function get_downloads( $product, $context = 'view' ) {
+		$downloads = array();
+
+		if ( $product->is_downloadable() || 'edit' === $context ) {
+			foreach ( $product->get_downloads() as $file_id => $file ) {
+				$downloads[] = array(
+					'id'   => $file_id, // MD5 hash.
+					'name' => $file['name'],
+					'file' => $file['file'],
+				);
+			}
+		}
+
+		return $downloads;
+	}
+
+	/**
 	 * Prepare a single variation output for response.
 	 *
 	 * @param  WC_Data         $object  Object data.
@@ -76,6 +100,7 @@ class WC_REST_Product_Variations_Controller extends WC_REST_Product_Variations_V
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$data    = array(
 			'id'                    => $object->get_id(),
+			'type'                  => $object->get_type(),
 			'date_created'          => wc_rest_prepare_date_response( $object->get_date_created(), false ),
 			'date_created_gmt'      => wc_rest_prepare_date_response( $object->get_date_created() ),
 			'date_modified'         => wc_rest_prepare_date_response( $object->get_date_modified(), false ),
@@ -95,7 +120,7 @@ class WC_REST_Product_Variations_Controller extends WC_REST_Product_Variations_V
 			'purchasable'           => $object->is_purchasable(),
 			'virtual'               => $object->is_virtual(),
 			'downloadable'          => $object->is_downloadable(),
-			'downloads'             => $this->get_downloads( $object ),
+			'downloads'             => $this->get_downloads( $object, $context ),
 			'download_limit'        => '' !== $object->get_download_limit() ? (int) $object->get_download_limit() : -1,
 			'download_expiry'       => '' !== $object->get_download_expiry() ? (int) $object->get_download_expiry() : -1,
 			'tax_status'            => $object->get_tax_status(),
@@ -476,6 +501,12 @@ class WC_REST_Product_Variations_Controller extends WC_REST_Product_Variations_V
 				'id'                    => array(
 					'description' => __( 'Unique identifier for the resource.', 'woocommerce' ),
 					'type'        => 'integer',
+					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'type'                  => array(
+					'description' => __( 'Product type.', 'woocommerce' ),
+					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),
@@ -1097,8 +1128,9 @@ class WC_REST_Product_Variations_Controller extends WC_REST_Product_Variations_V
 		$response          = array();
 		$product           = wc_get_product( $product_id );
 		$default_values    = isset( $request['default_values'] ) ? $request['default_values'] : array();
+		$meta_data         = isset( $request['meta_data'] ) ? $request['meta_data'] : array();
 		$data_store        = $product->get_data_store();
-		$response['count'] = $data_store->create_all_product_variations( $product, Constants::get_constant( 'WC_MAX_LINKED_VARIATIONS' ), $default_values );
+		$response['count'] = $data_store->create_all_product_variations( $product, Constants::get_constant( 'WC_MAX_LINKED_VARIATIONS' ), $default_values, $meta_data );
 
 		if ( isset( $request['delete'] ) && $request['delete'] ) {
 			$deleted_count             = $this->delete_unmatched_product_variations( $product );

@@ -4,7 +4,7 @@ Tags: Bootstrap, Bootstrap Blocks, Bootstrap 5, Gutenberg, Gutenberg Blocks, Blo
 Requires at least: 5
 Tested up to: 6.4
 Requires PHP: 7.0
-Stable tag: 1.3.17
+Stable tag: 1.3.18
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,6 +107,9 @@ Bootstrap is included. However you have the ability to switch this off in your W
 [Please add any feature requests or bugs within the support section.](https://wordpress.org/support/plugin/all-bootstrap-blocks/)
 
 == Changelog ==
+
+= 1.3.18 =
+* FIX: https://wordpress.org/support/topic/php-warning-is-appeared-in-the-logs-when-use-svg-image-as-icon-in-alert-block/
 
 = 1.3.17 =
 * FIX: Vulnerability fix reported by patchstack

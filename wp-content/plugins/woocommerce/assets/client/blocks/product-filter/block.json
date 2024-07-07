@@ -11,9 +11,6 @@
 		"reusable": false
 	},
 	"usesContext": [ "query", "queryId" ],
-	"providesContext": {
-		"collectionData": "collectionData"
-	},
 	"attributes": {
 		"filterType": {
 			"type": "string"
@@ -21,9 +18,18 @@
 		"heading": {
 			"type": "string"
 		},
-		"collectionData": {
-			"type": "object",
-			"default": {}
+		"isPreview": {
+			"type": "boolean",
+			"default": false
+		},
+		"attributeId": {
+			"type": "number",
+			"default": 0
+		}
+	},
+	"example": {
+		"attributes": {
+			"isPreview": true
 		}
 	},
 	"apiVersion": 2,
