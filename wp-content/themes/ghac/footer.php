@@ -1,7 +1,7 @@
     <footer class="footer">
         <div class="container">
             <div class="row">
-                <div class="col-xs">
+                <div class="col-6 col-md-4 order-1">
                     <h5>Gosforth Harriers &amp; Athletics Club</h5>
                     <p>Broadway West Playing Fields</p>
                     <p>Broadway West</p>
@@ -15,13 +15,13 @@
                         <li><a href="https://www.instagram.com/gosforthharriers" target="_blank"><i class="bi bi-instagram"></i></a></li>
                     </ul>
                 </div>
-                <div class="d-none d-sm-block col-xs">
+                <div class="col-12 col-md-4 order-3 order-md-2">
                     <div class="affiliates">
                         <img src="<?php echo get_template_directory_uri(); ?>/assets/img/england-athletics-logo.png" class="small-logo" alt="England Athletics" />
                         <img src="<?php echo get_template_directory_uri(); ?>/assets/img/british-athletics-logo.png" class="medium-logo" alt="British Athletics" />
                     </div>
                 </div>
-                <div class="col-xs">
+                <div class="col-6 col-md-4 order-2 order-md-3">
                     <div class="useful-links">
                         <h5>Useful Links</h5>
                         <?php 
