@@ -140,6 +140,26 @@ if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 				'EmailID' => $emailID
 			) );
 
+			// Let's send the person an email to tell them.
+			$emailSubject = 'Gosforth Harriers Summer Relays - New Team: ' . $teamName;
+            $emailBody = 'Hi ' . $firstName;
+            $emailBody = $emailBody . '<br /><br />Thank you for registering a team for the Gosforth Harriers & AC Summer Relays. It\'s fantastic to have you on board for what will be a great event.';
+            $emailBody = $emailBody . '<br /><br />We have introduced a registration process which puts you in control up until when you pick up your race numbers on Sunday 4th August 2024. At this stage the teams will be locked and you will need to speak to one of our amazing administration team to make any changes. ';
+			$emailBody = $emailBody . '<br /><br />To enable this we have built our very own team manager which will allow you to select the catgory for your team, update your runners, add additional admins and have some fun coming up with team names (let\'s keep them clean!).';
+            $emailBody = $emailBody . '<br /><br />To access the team manager click on the following link:';
+            $emailBody = $emailBody . '<br /><br /><a href="' . get_page_permalink_by_pageslug( 'summer-relays/summer-relays-login' ) . '">Go to the Gosforth Summer Relays Team Manager</a>';
+			$emailBody = $emailBody . '<br /><br />You may receive more emails similar to this depending on how many teams you have registered. We would never spam you, this is perfectly normal. It\'s just how our system works to get you registered with all of your teams. All you need is the link above to access the team manager which will allow you to administer all of your teams easily and conveniently.';
+			$emailBody = $emailBody . '<br /><br />If you experience any issues with the team manager, don\'t worry we won\'t run off and leave you behind (we\'ll keep that for the event). All you need to do is reply to this email and our webmaster will unplug himself from the Matrix long enough to answer your query.';
+            $emailBody = $emailBody . '<br /><br />For now, keep the training going! We look forward to seeing your teams on Sunday 4th August 2024.';
+			$emailBody = $emailBody . '<br /><br />Gosforth Harriers & AC';
+			$headers[] = 'Content-Type: text/html; charset=UTF-8';
+            $headers[] = 'Reply-To: Gosforth Harriers <webmaster@gosforth-harriers.org>';
+
+            if (wp_mail($email, $emailSubject, $emailBody, $headers) == false) {
+                $sendErr = true;
+                $postSuccess = false;
+            }
+
 			// Everything went to plan so let's redirect to the edit page for this team
 			wp_redirect( get_page_permalink_by_pageslug( 'summer-relays/edit-team' ) . '?teamid=' . $teamID );
 			//header('Location: ' . get_page_permalink_by_pageslug( 'summer-relays/edit-team' ) . '?teamid=' . $wpdb->insert_id);
