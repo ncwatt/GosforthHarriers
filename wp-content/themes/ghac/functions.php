@@ -7,6 +7,30 @@
  * 
  */
 
+if ( ! function_exists( 'ghac_session' ) ) :
+  function ghac_session() {
+    if ( ! session_id() ) :
+      session_start();
+    endif;
+
+    if ( empty( $_SESSION['ip_address'] ) ) :
+      $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+    endif;
+
+    if ( empty( $_SESSION['user_agent'] ) ) :
+      $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+    endif;
+
+    if ($_SESSION['ip_address'] !== $_SERVER['REMOTE_ADDR'] || $_SESSION['user_agent'] !== $_SERVER['HTTP_USER_AGENT']) :
+      // Invalidate session
+      session_destroy();
+    endif;
+
+    //$_SESSION['relays_user_email'] = "nick@gtctek.co.uk";
+  }
+endif;
+add_action('init', 'ghac_session');
+
 if ( ! function_exists( 'ghac_setup' ) ) :
   function ghac_setup() {
     // Add default posts and comments RSS feed links to <head>
@@ -221,6 +245,7 @@ class bootstrap_5_wp_nav_menu_walker extends Walker_Nav_menu
     if ($depth && $args->walker->has_children) {
       $classes[] = 'dropdown-menu dropdown-menu-end';
     }
+
     $class_names =  join(' ', apply_filters('nav_menu_css_class', array_filter($classes), $item, $args));
     $class_names = ' class="' . esc_attr($class_names) . '"';
 
