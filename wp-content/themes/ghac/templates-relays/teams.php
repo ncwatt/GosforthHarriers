@@ -2,6 +2,13 @@
 /*
 	Template Name: Summer Relays - Teams List
 */
+// Check that the user is logged in or has a valid team editor session
+if ( ( ! is_user_logged_in() )  && ( ! isset( $_SESSION['relays_user_email'] ) ) ) { wp_redirect( get_page_permalink_by_pageslug( 'summer-relays/summer-relays-login' ) ); }
+
+// Determine if the user is an administrator or not
+$user = wp_get_current_user();
+if ( is_user_in_role( 'administrator' ) ) { $isAdmin = true; } else { $isAdmin = false; }
+
 ?>
 <?php get_header(); ?>
 <div class="content-1">
@@ -26,7 +33,25 @@
   					</thead>
 					<tbody>
 						<?php
-							$teams = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}ghac_c_teams" );
+							// If user is an admin get all of the teams, otherwise just the ones relevant to the particular session
+							if ( $isAdmin ) :
+								$teams = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}ghac_c_teams" ) );
+							else :
+								$teams = $wpdb->get_results( $wpdb->prepare( 
+									"SELECT {$wpdb->prefix}ghac_c_teams.TeamID, {$wpdb->prefix}ghac_c_teams.TeamNumber, " .
+											"{$wpdb->prefix}ghac_c_teams.TeamName, {$wpdb->prefix}ghac_c_teams.ClubName, {$wpdb->prefix}ghac_c_teams.Category, " . 
+											"{$wpdb->prefix}ghac_c_teams.RunnerA, {$wpdb->prefix}ghac_c_teams.RunnerATime, {$wpdb->prefix}ghac_c_teams.RunnerALegTime, " . 
+											"{$wpdb->prefix}ghac_c_teams.RunnerB, {$wpdb->prefix}ghac_c_teams.RunnerBTime, {$wpdb->prefix}ghac_c_teams.RunnerBLegTime, " .
+											"{$wpdb->prefix}ghac_c_teams.RunnerC, {$wpdb->prefix}ghac_c_teams.RunnerCTime, {$wpdb->prefix}ghac_c_teams.RunnerCLegTime, " .
+											"{$wpdb->prefix}ghac_c_teams.TeamTime " .
+										"FROM {$wpdb->prefix}ghac_c_teams " .
+											"INNER JOIN {$wpdb->prefix}ghac_c_teamemails ON {$wpdb->prefix}ghac_c_teams.TeamID = {$wpdb->prefix}ghac_c_teamemails.TeamID " .
+											"INNER JOIN {$wpdb->prefix}ghac_c_emails ON {$wpdb->prefix}ghac_c_teamemails.EmailID = {$wpdb->prefix}ghac_c_emails.EmailID " .
+										"WHERE {$wpdb->prefix}ghac_c_emails.EmailAddress = %s", $_SESSION['relays_user_email'] 
+									)
+								);
+							endif;
+							
 							foreach($teams as $row) {
 						?>
 							<tr>
